@@ -1,133 +1,58 @@
 #!/bin/bash
 
 # Git Commit Tracker for macOS (Node.js Version)
-# Bu script tüm git commit'leri global olarak yakalar ve günlük sayıları JSON dosyasına kaydeder
+# This script captures all git commits globally and saves daily counts to a JSON file
 
-# Konfigürasyon
+# Configuration
 TRACKER_DIR="$HOME/.git-commit-tracker"
 JSON_FILE="$TRACKER_DIR/daily_commits.json"
 LOG_FILE="$TRACKER_DIR/tracker.log"
 
-# Dizin oluştur
+# Create directory
 mkdir -p "$TRACKER_DIR"
 
-# JSON dosyasını başlat (eğer yoksa)
+# Initialize JSON file (if it doesn't exist)
 if [ ! -f "$JSON_FILE" ]; then
     echo '{}' >"$JSON_FILE"
 fi
 
-# Node.js commit tracker script'ini oluştur
+# Create Node.js commit tracker script
 create_nodejs_tracker() {
     cat >"$TRACKER_DIR/commit-tracker.js" <<'NODE_EOF'
 #!/usr/bin/env node
 
 const fs = require('fs');
 const path = require('path');
-const os = require('os');
 
 const TRACKER_DIR = path.join(os.homedir(), '.git-commit-tracker');
 const JSON_FILE = path.join(TRACKER_DIR, 'daily_commits.json');
 const LOG_FILE = path.join(TRACKER_DIR, 'tracker.log');
 
-// Commit sayısını artır
+// Increment commit count
 function incrementCommitCount() {
   const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
   
   try {
-      // JSON dosyasını oku
-      let data = {};
-      if (fs.existsSync(JSON_FILE)) {
-          const fileContent = fs.readFileSync(JSON_FILE, 'utf8');
-          try {
-              data = JSON.parse(fileContent);
-          } catch (parseError) {
-              console.error('JSON parse error, creating new data object');
-              data = {};
-          }
-      }
-      
-      // Bugünün sayısını artır
-      if (data[today]) {
-          data[today] += 1;
-      } else {
-          data[today] = 1;
-      }
-      
-      // JSON dosyasını güncelle
-      fs.writeFileSync(JSON_FILE, JSON.stringify(data, null, 2));
-      
-      // Log kaydı
-      const logEntry = `${new Date().toISOString()}: Commit recorded for ${today}\n`;
-      fs.appendFileSync(LOG_FILE, logEntry);
-      
-      console.log(`Commit count updated: ${today} = ${data[today]}`);
-      
-  } catch (error) {
-      console.error('Error updating commit count:', error);
+      // Read JSON file
+{{ ... }}
       const errorLog = `${new Date().toISOString()}: ERROR - ${error.message}\n`;
       fs.appendFileSync(LOG_FILE, errorLog);
   }
 }
 
-// İstatistikleri göster
+// Show statistics
 function showStats() {
   try {
       if (!fs.existsSync(JSON_FILE)) {
           console.log('No commit data found.');
           return;
-      }
-      
-      const data = JSON.parse(fs.readFileSync(JSON_FILE, 'utf8'));
-      
-      if (Object.keys(data).length === 0) {
-          console.log('No commits recorded yet.');
-          return;
-      }
-      
-      console.log('=== Git Commit Statistics ===');
-      
-      // Toplam commit sayısı
-      const totalCommits = Object.values(data).reduce((sum, count) => sum + count, 0);
-      console.log(`Total commits tracked: ${totalCommits}`);
-      console.log(`Days with commits: ${Object.keys(data).length}`);
-      
-      // Son 7 günün istatistikleri
-      console.log('\nLast 7 days:');
-      for (let i = 6; i >= 0; i--) {
-          const date = new Date();
-          date.setDate(date.getDate() - i);
-          const dateStr = date.toISOString().split('T')[0];
-          const commits = data[dateStr] || 0;
-          console.log(`  ${dateStr}: ${commits} commits`);
-      }
-      
-      // En aktif günler
-      console.log('\nTop 5 most active days:');
-      const sortedDays = Object.entries(data)
-          .sort(([,a], [,b]) => b - a)
-          .slice(0, 5);
-          
-      sortedDays.forEach(([date, count]) => {
-          console.log(`  ${date}: ${count} commits`);
-      });
-      
-      // Haftalık ortalama
-      const weeklyAverage = totalCommits / Math.max(1, Object.keys(data).length / 7);
-      console.log(`\nWeekly average: ${weeklyAverage.toFixed(1)} commits`);
-      
-      // Bu ay toplam
-      const currentMonth = new Date().toISOString().substring(0, 7); // YYYY-MM
-      const monthlyCommits = Object.entries(data)
-          .filter(([date]) => date.startsWith(currentMonth))
-          .reduce((sum, [, count]) => sum + count, 0);
-      console.log(`This month total: ${monthlyCommits} commits`);
-      
+{{ ... }}
   } catch (error) {
       console.error('Error reading statistics:', error);
   }
 }
 
-// Verileri sıfırla
+// Reset data
 function resetData() {
   try {
       fs.writeFileSync(JSON_FILE, '{}');
@@ -138,12 +63,13 @@ function resetData() {
   }
 }
 
-// Log dosyasını göster
+// Show log file
 function showLog() {
   try {
       if (!fs.existsSync(LOG_FILE)) {
           console.log('No log file found.');
           return;
+{{ ... }}
       }
       
       const logContent = fs.readFileSync(LOG_FILE, 'utf8');
@@ -239,12 +165,12 @@ NODE_EOF
     chmod +x "$TRACKER_DIR/commit-tracker.js"
 }
 
-# Commit sayacı fonksiyonu (Node.js kullanarak)
+# Commit counter function (using Node.js)
 increment_commit_count() {
     node "$TRACKER_DIR/commit-tracker.js" increment
 }
 
-# Global git hook kurulumu
+# Global git hook setup
 setup_global_hooks() {
     echo "Setting up global git hooks..."
 
@@ -277,17 +203,17 @@ HOOK_EOF
     echo "Global git hooks configured successfully!"
 }
 
-# İstatistik görüntüleme fonksiyonu
+# Statistics display function
 show_stats() {
     node "$TRACKER_DIR/commit-tracker.js" stats
 }
 
-# Haftalık rapor
+# Weekly report
 weekly_report() {
     node "$TRACKER_DIR/commit-tracker.js" weekly
 }
 
-# Yardım fonksiyonu
+# Help function
 show_help() {
     echo "Git Commit Tracker - macOS (Node.js Version)"
     echo "Usage: $0 [command]"
@@ -307,7 +233,7 @@ show_help() {
     echo "  Node.js tracker: $TRACKER_DIR/commit-tracker.js"
 }
 
-# Reset fonksiyonu
+# Reset function
 reset_data() {
     read -p "Are you sure you want to reset all commit data? (y/N): " confirm
     if [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]]; then
@@ -317,14 +243,14 @@ reset_data() {
     fi
 }
 
-# Test fonksiyonu
+# Test function
 test_tracker() {
     echo "Testing commit tracker..."
     node "$TRACKER_DIR/commit-tracker.js" increment
     echo "Test completed. Check stats to see if it worked."
 }
 
-# Ana komut işleme
+# Main command processing
 case "$1" in
 setup)
     create_nodejs_tracker
