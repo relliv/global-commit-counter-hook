@@ -1,0 +1,1 @@
+# global-commit-counter-hook
