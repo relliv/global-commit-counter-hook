@@ -1,0 +1,18 @@
+{
+  "$schema": "https://cdn.statically.io/gh/nguyenngoclongdev/cdn/main/schema/v11/terminal-keeper.json",
+  "theme": "tribe",
+  "active": "default",
+  "activateOnStartup": true,
+  "keepExistingTerminals": false,
+  "sessions": {
+    "default": [
+      {
+        "name": "stats",
+        "autoExecuteCommands": true,
+        "icon": "server-environment",
+        "color": "terminal.ansiGreen",
+        "commands": ["sh git-tracker.sh stats"]
+      }
+    ]
+  }
+}

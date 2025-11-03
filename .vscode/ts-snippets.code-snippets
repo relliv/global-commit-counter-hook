@@ -1,0 +1,10 @@
+{
+	"Import environment": {
+		"scope": "javascript,typescript",
+		"prefix": "_env_import",
+		"body": [
+			"import { environment } from \"@ngeenx/ngn-environments\";"
+		],
+		"description": "Import environment"
+	}
+}
